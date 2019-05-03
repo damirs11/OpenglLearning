@@ -50,8 +50,15 @@ add_definitions(
 
 
 # 1_OpenGL
+file(COPY 1_OpenGL/Shaders DESTINATION ${CMAKE_BINARY_DIR})
+
+file(GLOB_RECURSE SRC
+    "1_OpenGL/*.h"
+    "1_OpenGL/*.cpp"
+)
+
 add_executable(1_OpenGL 
-	1_OpenGL/Main.cpp
+	${SRC}
 )
 target_link_libraries(1_OpenGL 
 	${ALL_LIBS}
@@ -59,3 +66,16 @@ target_link_libraries(1_OpenGL
 # Xcode and Visual working directories
 set_target_properties(1_OpenGL  PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/1_OpenGL /")
 create_target_launcher(1_OpenGL  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/1_OpenGL /")
+
+# 2_OpenGL
+add_executable(2_OpenGL 
+	2_OpenGL/Main.cpp
+	2_OpenGL/imgui_code.cpp
+	2_OpenGL/imgui_code.h
+)
+target_link_libraries(2_OpenGL 
+	${ALL_LIBS}
+)
+# Xcode and Visual working directories
+set_target_properties(2_OpenGL  PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/2_OpenGL /")
+create_target_launcher(2_OpenGL  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/2_OpenGL /")
