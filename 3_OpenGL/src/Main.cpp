@@ -55,7 +55,6 @@ int main()
 
 
 	Shader shader("Assets/vertexShader.vert", "Assets/fragmentShader.frag");
-
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	float vertices[] = {
 		// positions         // colors
@@ -79,14 +78,31 @@ int main()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-
-
 	int nrAttributes;
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
 	std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
 
 	
+
+	float texCoords[] = {
+	0.0f, 0.0f,  // lower-left corner  
+	1.0f, 0.0f,  // lower-right corner
+	0.5f, 1.0f   // top-center corner
+	};
+
+	// * GL_REPEAT: The default behavior for textures.Repeats the texture image.
+	// * GL_MIRRORED_REPEAT : Same as GL_REPEAT but mirrors the image with each repeat.
+	// * GL_CLAMP_TO_EDGE : Clamps the coordinates between 0 and 1. The result is that higher coordinates become clamped to the edge, resulting in a stretched edge pattern.
+	// * GL_CLAMP_TO_BORDER : Coordinates outside the range are now given a user - specified border color.*/
+	//----------------------------------------------------------------------------------------------------
+
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT); // S = X
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT); // T = Y
 	
+	// * GL_CLAMP_TO_BORDER
+	// float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+	// glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
 	// render loop
 	// -----------
 	while (!glfwWindowShouldClose(window))
