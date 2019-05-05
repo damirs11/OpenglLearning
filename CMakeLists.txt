@@ -30,7 +30,8 @@ include(MSVCMultipleProcessCompile) # /MP
 include_directories(
 	external/glfw/include/
 	external/glad/include/
-	external/imgui/src
+	external/imgui/src/
+	external/stb_lib
 	.
 )
 
@@ -114,6 +115,7 @@ file(COPY ${Assets} DESTINATION Assets NO_SOURCE_PERMISSIONS)
 add_executable(${NAME} 
 	${SRC}
 	${Assets}
+	${STB}
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/${NAME}/Assets PREFIX "Assets" FILES ${Assets})

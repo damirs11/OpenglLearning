@@ -45,3 +45,9 @@ add_subdirectory (glad)
 
 add_subdirectory (imgui)
 
+### stb_image ###
+
+file(GLOB STB
+	stb/*.cpp
+	stb/*.h
+)
