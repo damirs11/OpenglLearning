@@ -17,14 +17,6 @@ const unsigned int SCR_HEIGHT = 600;
 
 
 
-const char* fragmentShaderSource1 = "#version 330 core\n"
-	"out vec4 FragColor;\n"
-	"in  vec3 ourColor;\n"
-	"void main()\n"
-	"{\n"
-	"   FragColor = vec4(ourColor, 1.0f);\n"
-	"}\n\0";
-
 IMGUI overlay_imgui;
 
 
@@ -62,7 +54,7 @@ int main()
 	overlay_imgui.init_imgui(window);
 
 
-	Shader shader("Shaders/vertexShader.glsl", "Shaders/fragmentShader.glsl");
+	Shader shader("Assets/vertexShader.vert", "Assets/fragmentShader.frag");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	float vertices[] = {
@@ -74,6 +66,7 @@ int main()
 	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
+
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -92,7 +85,7 @@ int main()
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
 	std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
 
-
+	
 	
 	// render loop
 	// -----------
@@ -101,11 +94,6 @@ int main()
 		// events handle
 		glfwPollEvents();
 
-		
-		int display_w, display_h;
-		glfwMakeContextCurrent(window);
-		glfwGetFramebufferSize(window, &display_w, &display_h);
-		glViewport(0, 0, display_w, display_h);
 
 		glClearColor(overlay_imgui.color_clear.x, overlay_imgui.color_clear.y, overlay_imgui.color_clear.z, overlay_imgui.color_clear.w);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -117,6 +105,7 @@ int main()
 
 
 		// draw our first triangle
+		shader.setFloat("xOffset", overlay_imgui.xOffset);
 		shader.use();
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);

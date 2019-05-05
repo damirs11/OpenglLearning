@@ -50,22 +50,35 @@ add_definitions(
 
 
 # 1_OpenGL
-file(COPY 1_OpenGL/Shaders DESTINATION ${CMAKE_BINARY_DIR})
+set(NAME 1_OpenGL)
 
 file(GLOB_RECURSE SRC
-    "1_OpenGL/*.h"
-    "1_OpenGL/*.cpp"
+    "${NAME}/src/*.h"
+    "${NAME}/src/*.cpp"
 )
 
-add_executable(1_OpenGL 
-	${SRC}
+set(ASSETS_DIR "${NAME}/Assets/")
+
+file(GLOB Assets
+	"${ASSETS_DIR}/Shaders/*.*"
+    "${ASSETS_DIR}/Textures/*.*"
+}
 )
-target_link_libraries(1_OpenGL 
+
+
+add_executable(${NAME} 
+	${SRC}
+	${Assets}
+)
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/${NAME}/Assets PREFIX "Assets" FILES ${Assets})
+
+target_link_libraries(${NAME} 
 	${ALL_LIBS}
 )
 # Xcode and Visual working directories
-set_target_properties(1_OpenGL  PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/1_OpenGL /")
-create_target_launcher(1_OpenGL  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/1_OpenGL /")
+set_target_properties(${NAME}  PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${NAME} /")
+create_target_launcher(${NAME}  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${NAME} /")
 
 # 2_OpenGL
 add_executable(2_OpenGL 
@@ -79,3 +92,35 @@ target_link_libraries(2_OpenGL
 # Xcode and Visual working directories
 set_target_properties(2_OpenGL  PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/2_OpenGL /")
 create_target_launcher(2_OpenGL  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/2_OpenGL /")
+
+# 3_OpenGL
+set(NAME 3_OpenGL)
+
+file(GLOB_RECURSE SRC
+    "${NAME}/src/*.h"
+    "${NAME}/src/*.cpp"
+)
+
+set(ASSETS_DIR "${NAME}/Assets/")
+
+file(GLOB Assets
+	"${ASSETS_DIR}/Shaders/*.*"
+    "${ASSETS_DIR}/Textures/*.*"
+})
+
+file(COPY ${Assets} DESTINATION Assets NO_SOURCE_PERMISSIONS)
+
+
+add_executable(${NAME} 
+	${SRC}
+	${Assets}
+)
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/${NAME}/Assets PREFIX "Assets" FILES ${Assets})
+
+target_link_libraries(${NAME} 
+	${ALL_LIBS}
+)
+# Xcode and Visual working directories
+set_target_properties(${NAME}  PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${NAME} /")
+create_target_launcher(${NAME}  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${NAME} /")

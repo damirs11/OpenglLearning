@@ -3,6 +3,7 @@
 IMGUI::IMGUI()
 {
 	color_clear = ImVec4(0.45f, 0.55f, 0.60f, 1.00);
+	xOffset = 0.0f;
 }
 
 void IMGUI::init_imgui(GLFWwindow* window)
@@ -45,7 +46,7 @@ void IMGUI::forloop_imgui()
 		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 		ImGui::Checkbox("Enable Wireframe", &enable_wireframe);
 
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::SliderFloat("xOffset", &xOffset, -1.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 		ImGui::ColorEdit3("clear color", (float*)& color_clear); // Edit 3 floats representing a color
 
 		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)

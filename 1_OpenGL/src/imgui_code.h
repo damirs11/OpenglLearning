@@ -22,6 +22,7 @@ public:
 public:
 	bool init = false;
 	ImVec4 color_clear;
+	float xOffset;
 
 private:
 	const char* glsl_version = "#version 150";
