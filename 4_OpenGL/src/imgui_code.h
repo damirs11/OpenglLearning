@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef OVERLAY_IMGUI_H
+#define OVERLAY_IMGUI_H
+
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -22,15 +25,19 @@ public:
 public:
 	bool init = false;
 
+	
+	int selectedItem = 0;
+	bool enable_wireframe = false;
+
 	ImVec4 color_clear;
-	float xOffset;
 	float alphaLevel;
 
 private:
 	const char* glsl_version = "#version 150";
 
 	bool show_demo_window = false;
-	bool enable_wireframe = false;
 
 	
 };
+
+#endif // OVERLAY_IMGUI_H

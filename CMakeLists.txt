@@ -32,6 +32,7 @@ include_directories(
 	external/glad/include/
 	external/imgui/src/
 	external/stb_lib
+	external/glm
 	.
 )
 
@@ -96,6 +97,40 @@ create_target_launcher(2_OpenGL  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/
 
 # 3_OpenGL
 set(NAME 3_OpenGL)
+
+file(GLOB_RECURSE SRC
+    "${NAME}/src/*.h"
+    "${NAME}/src/*.cpp"
+)
+
+set(ASSETS_DIR "${NAME}/Assets/")
+
+file(GLOB Assets
+	"${ASSETS_DIR}/Shaders/*.*"
+    "${ASSETS_DIR}/Textures/*.*"
+})
+
+file(COPY ${Assets} DESTINATION Assets NO_SOURCE_PERMISSIONS)
+
+
+add_executable(${NAME} 
+	${SRC}
+	${Assets}
+	${STB}
+)
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/${NAME}/Assets PREFIX "Assets" FILES ${Assets})
+
+target_link_libraries(${NAME} 
+	${ALL_LIBS}
+)
+# Xcode and Visual working directories
+set_target_properties(${NAME}  PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${NAME} /")
+create_target_launcher(${NAME}  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${NAME} /")
+
+
+# 4_OpenGL
+set(NAME 4_OpenGL)
 
 file(GLOB_RECURSE SRC
     "${NAME}/src/*.h"

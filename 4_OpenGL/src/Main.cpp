@@ -1,8 +1,12 @@
 #include "imgui_code.h"
 #include "Shader.h"
+#include "Image.h"
+#include "Texture.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -17,8 +21,6 @@ void processInput(GLFWwindow* window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-
-
 
 IMGUI overlay_imgui;
 
@@ -74,24 +76,33 @@ int main()
 	// * GL_NEAREST_MIPMAP_LINEAR : linearly interpolates between the two mipmaps that most closely match the size of a pixeland samples via nearest neighbor interpolation.
 	// * GL_LINEAR_MIPMAP_LINEAR : linearly interpolates between the two closest mipmapsand samples the texture via linear interpolation.
 
-
 	
 
 
 	Shader shader("Assets/vertexShader.vert", "Assets/fragmentShader.frag");
 
+	Image image_cont("Assets/container.jpg");
+	Image image_face("Assets/awesomeface.png");
+
+	Texture texture_1(image_cont, GL_RGB);
+	Texture texture_2(image_face);
+
+	texture_2.SetWrapping(GL_MIRRORED_REPEAT);
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	float vertices[] = {
-		// positions         // colors
-		-0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.45f, 0.55f, // top left
-		 0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  0.55f, 0.55f, // top right
-		 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.55f, 0.45f, // bottom right
-		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.45f, 0.45f  // bottom left
+		// positions         // colors			// textures
+		-0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, // top left
+		 0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // top right
+		 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // bottom right
+		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // bottom left
+
+		 0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 0.0f,  0.5f, 1.0f, // top
+		-1.0f, -1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, // bottom left
+		 1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f  // bottom right
 	};
 	int indices[] = {
-		0, 1, 3,
-		1, 2, 3
+		4, 5, 6
 	};
 	unsigned int VAO, VBO, EBO;
 
@@ -116,60 +127,15 @@ int main()
 	// textures attribute
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-
-	unsigned int texture1;
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	// load and generate the texture
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("Assets/container.jpg", &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
-
-	unsigned int texture2;
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load and generate the texture
-	stbi_set_flip_vertically_on_load(true);
-	data = stbi_load("Assets/awesomeface.png", &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_set_flip_vertically_on_load(false);
-	stbi_image_free(data);
-
 	
 
 
 	shader.use();
 	shader.setInt("texture1", 0);
 	shader.setInt("texture2", 1);
+
+	
+
 
 	// render loop
 	// -----------
@@ -189,19 +155,29 @@ int main()
 		
 		// bind texture
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
+		glBindTexture(GL_TEXTURE_2D, texture_1);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
+		glBindTexture(GL_TEXTURE_2D, texture_2);
 
-		// draw our first triangle
-		shader.setFloat("xOffset", overlay_imgui.xOffset);
+		// GLM
+		glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+		// first container
+		// ---------------
+		shader.setMat4("transform", transform);
 		shader.setFloat("alphaLevel", overlay_imgui.alphaLevel);
-		shader.use();
+
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 
 		// IMGUI
 		overlay_imgui.forloop_imgui();
+
+		if (overlay_imgui.enable_wireframe)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
 
 		glfwMakeContextCurrent(window);
 		glfwSwapBuffers(window);

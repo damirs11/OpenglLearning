@@ -51,3 +51,10 @@ file(GLOB STB
 	stb/*.cpp
 	stb/*.h
 )
+
+### GLM ###
+
+
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+add_subdirectory(glm)
