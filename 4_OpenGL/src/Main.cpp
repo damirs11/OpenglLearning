@@ -82,27 +82,44 @@ int main()
 	Shader shader("Assets/vertexShader.vert", "Assets/fragmentShader.frag");
 
 	Image image_cont("Assets/container.jpg");
-	Image image_face("Assets/awesomeface.png");
+	Image image_face("Assets/awesomeface.png", true);
 
 	Texture texture_1(image_cont, GL_RGB);
 	Texture texture_2(image_face);
 
-	texture_2.SetWrapping(GL_MIRRORED_REPEAT);
-
-	// set up vertex data (and buffer(s)) and configure vertex attributes
+	
+	// positions         // textures
 	float vertices[] = {
-		// positions         // colors			// textures
-		-0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, // top left
-		 0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // top right
-		 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // bottom right
-		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // bottom left
+	-0.5f, -0.5f,  0.5f,
+	 0.5f, -0.5f,  0.5f,
+	 0.5f,  0.5f,  0.5f,
+	-0.5f,  0.5f,  0.5f,
 
-		 0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 0.0f,  0.5f, 1.0f, // top
-		-1.0f, -1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, // bottom left
-		 1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f  // bottom right
+	-0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f, -0.5f,
+	 0.5f,  0.5f, -0.5f,
+	-0.5f,  0.5f, -0.5f
+
 	};
 	int indices[] = {
-		4, 5, 6
+		// front
+		0, 1, 2,
+		2, 3, 0,
+		// right
+		1, 5, 6,
+		6, 2, 1,
+		// back
+		7, 6, 5,
+		5, 4, 7,
+		// left
+		4, 0, 3,
+		3, 7, 4,
+		// bottom
+		4, 5, 1,
+		1, 0, 4,
+		// top
+		3, 2, 6,
+		6, 7, 3
 	};
 	unsigned int VAO, VBO, EBO;
 
@@ -119,14 +136,10 @@ int main()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	// textures attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
 	
 
 
@@ -159,15 +172,31 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture_2);
 
+		shader.use();
+
 		// GLM
-		glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-		// first container
-		// ---------------
-		shader.setMat4("transform", transform);
+		glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+		glm::mat4 view = glm::mat4(1.0f);
+		glm::mat4 projection = glm::mat4(1.0f);
+
+		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
+		// retrieve the matrix uniform locations
+		unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
+		unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
+
+		// pass them to the shaders (3 different ways)
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+
+		// note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
+		shader.setMat4("projection", projection);
 		shader.setFloat("alphaLevel", overlay_imgui.alphaLevel);
 
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 		// IMGUI
 		overlay_imgui.forloop_imgui();

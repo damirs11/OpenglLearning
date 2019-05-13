@@ -8,6 +8,7 @@ class Image
 public:
 
 	Image(const char* path);
+	Image(const char* path, bool flip);
 	~Image();
 
 

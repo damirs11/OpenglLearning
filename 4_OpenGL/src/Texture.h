@@ -21,6 +21,11 @@ public:
 	void SetWrapping(int wrapping_t_s, int wrapping_t_t);
 	void SetWrapping(int wrapping_t_s, int wrapping_t_t, int wrapping_t_r);
 
+	void Texture::SetFilters(int min, int mag);
+	void Texture::SetBorderColor(int r, int g, int b, int a);
+
+	void Texture::GenerateMipmaps();
+
 private:
 	GLuint obj;
 };
