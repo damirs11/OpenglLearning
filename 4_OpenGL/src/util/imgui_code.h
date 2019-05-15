@@ -28,6 +28,7 @@ public:
 	
 	int selectedItem = 0;
 	bool enable_wireframe = false;
+	float angle = 0.0f;
 
 	ImVec4 color_clear;
 	float alphaLevel;

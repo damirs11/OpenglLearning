@@ -51,6 +51,7 @@ void IMGUI::forloop_imgui()
 		ImGui::Checkbox("Enable Wireframe", &enable_wireframe);
 
 		ImGui::SliderFloat("Alpha Level", &alphaLevel, -1.0f, 1.0f);
+		ImGui::SliderFloat("Angle", &angle, -360.0f, 360.0f);
 
 		static const char* items[] = { "GL_NEAREST", "GL_LINEAR" };
 		if (ImGui::Combo("Combo", &selectedItem, items, IM_ARRAYSIZE(items)))
